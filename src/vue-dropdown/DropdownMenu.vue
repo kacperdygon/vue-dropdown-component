@@ -2,36 +2,35 @@
 import { ref, provide } from 'vue'
 
 const props = defineProps<{
-  defaultValue: any,
-  defaultLabel: any,
-}>();
+  defaultValue: any
+  defaultLabel: any
+}>()
 
 const emit = defineEmits<{
-  optionChanged: [newValue: any, newLabel: string];
-  menuOpened: [];
-}>();
+  optionChanged: [newValue: any, newLabel: string]
+  menuOpened: []
+}>()
 
-const model = defineModel();
+const model = defineModel()
 
-const ulElement = ref<HTMLElement | null>(null);
-const currentValue = ref<any>(props.defaultValue);
-const currentLabel = ref<string>(props.defaultLabel);
-const isOpen = ref<boolean>(false);
+const ulElement = ref<HTMLElement | null>(null)
+const currentValue = ref<any>(props.defaultValue)
+const currentLabel = ref<string>(props.defaultLabel)
+const isOpen = ref<boolean>(false)
 
 function onClick() {
-  isOpen.value = !isOpen.value;
+  isOpen.value = !isOpen.value
 }
 
 const selectOption = (value: any, label: string) => {
-  currentLabel.value = label;
-  currentValue.value = value;
-  isOpen.value = false;
-  model.value = value;
-  emit("optionChanged", value, label);
-};
+  currentLabel.value = label
+  currentValue.value = value
+  isOpen.value = false
+  model.value = value
+  emit('optionChanged', value, label)
+}
 
-provide<(value: any, label: string) => void>('selectOption', selectOption);
-
+provide<(value: any, label: string) => void>('selectOption', selectOption)
 </script>
 
 <template>
@@ -39,7 +38,7 @@ provide<(value: any, label: string) => void>('selectOption', selectOption);
     <button @click="onClick">
       {{ currentLabel }}
     </button>
-    <ul ref="ulElement" v-show='isOpen'>
+    <ul ref="ulElement" v-show="isOpen">
       <slot></slot>
     </ul>
   </div>

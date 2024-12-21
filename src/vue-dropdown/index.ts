@@ -1,4 +1,4 @@
-import DropdownMenu from './DropdownMenu.vue';
-import DropdownItem from './DropdownItem.vue';
+import DropdownMenu from './DropdownMenu.vue'
+import DropdownItem from './DropdownItem.vue'
 
-export { DropdownMenu, DropdownItem };
+export { DropdownMenu, DropdownItem }
