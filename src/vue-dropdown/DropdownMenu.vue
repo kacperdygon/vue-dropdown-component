@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, onBeforeUnmount, ref, nextTick } from 'vue'
+import { ref, provide } from 'vue'
 
 const props = defineProps<{
   defaultValue: any,
@@ -7,7 +7,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  optionChanged: [newValue: any];
+  optionChanged: [newValue: any, newLabel: string];
   menuOpened: [];
 }>();
 
@@ -27,25 +27,10 @@ const selectOption = (value: any, label: string) => {
   currentValue.value = value;
   isOpen.value = false;
   model.value = value;
-  emit("optionChanged", value);
+  emit("optionChanged", value, label);
 };
 
-const handleSelectEvent = (event: Event) => {
-  const customEvent = event as CustomEvent;
-  selectOption(customEvent.detail.optionValue, customEvent.detail.optionLabel);
-  customEvent.stopPropagation();
-}
-
-onMounted(() => {
-  nextTick(() => {
-    console.log('ulElement:', ulElement.value);
-    if (ulElement.value) {
-      ulElement.value.addEventListener('selectEvent', handleSelectEvent);
-    } else {
-      throw new Error('ulElement not assigned!');
-    }
-  });
-});
+provide<(value: any, label: string) => void>('selectOption', selectOption);
 
 </script>
 

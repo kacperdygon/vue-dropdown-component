@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useSlots, ref, onMounted } from 'vue'
+import { useSlots, ref, onMounted, inject } from 'vue'
 
 const slots = useSlots();
 const thisElement = ref<HTMLElement | null>(null);
@@ -9,32 +9,18 @@ const emit = defineEmits<{
 }>();
 
 const props = defineProps<{
-  value: any;
+  value?: any;
 }>();
-const label = ref<string | null>();
+
+const label = ref<string>();
+
+const selectOption = inject<(value: any, label: string) => void>('selectOption');
 
 const handleClick = () => {
-  emitDomSelectEvent();
   emit('optionSelected', props.value, label.value ? label.value : '');
+  if (!selectOption) throw new Error("Select option method not passed properly.");
+  selectOption(props.value, <string>label.value)
 };
-
-function emitDomSelectEvent() {
-
-  const customEvent = new CustomEvent('selectEvent', {
-    detail: {
-      optionValue: props.value,
-      optionLabel: label.value,
-    },
-    bubbles: true,
-    composed: true,
-  });
-
-  if (thisElement.value) {
-    thisElement.value.dispatchEvent(customEvent); // Dispatch the event
-  } else {
-    throw new Error('This element ref not set!');
-  }
-}
 
 onMounted(() => {
   label.value = slots.default ? slots.default()[0]?.children as string : '';
