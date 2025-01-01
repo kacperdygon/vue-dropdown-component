@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useSlots, ref, onMounted, inject } from 'vue'
+import { useSlots, ref, onMounted, inject, computed } from 'vue'
 
 const slots = useSlots()
 const thisElement = ref<HTMLElement | null>(null)
@@ -9,26 +9,42 @@ const emit = defineEmits<{
 }>()
 
 const props = defineProps<{
-  value?: any
+  value?: any,
+  disabled?: boolean,
+  selected?: boolean,
 }>()
 
 const label = ref<string>()
 
-const selectOption = inject<(value: any, label: string) => void>('selectOption')
+const parentSelectOption: ((value: any, label: string) => void) | undefined = inject('selectOption');
+
+const selectThisOption = () => {
+  if (!parentSelectOption) throw new Error('Select option method not provided by the parent.')
+  parentSelectOption(props.value, <string>label.value)
+}
 
 const handleClick = () => {
-  emit('optionSelected', props.value, label.value ? label.value : '')
-  if (!selectOption) throw new Error('Select option method not passed properly.')
-  selectOption(props.value, <string>label.value)
+  if (!props.disabled) {
+    emit('optionSelected', props.value, label.value ? label.value : '')
+    selectThisOption();
+  }
 }
 
 onMounted(() => {
-  label.value = slots.default ? (slots.default()[0]?.children as string) : ''
+  label.value = slots.default ? (slots.default()[0]?.children as string) : '';
+  if (props.selected) {
+    selectThisOption();
+  }
 })
+
+const classObject = computed(() => ({
+  disabled: props.disabled,
+}));
+
 </script>
 
 <template>
-  <li @click="handleClick" ref="thisElement">
+  <li @click="handleClick" ref="thisElement" :class='classObject'>
     <slot />
   </li>
 </template>
@@ -37,4 +53,10 @@ onMounted(() => {
 li {
   cursor: pointer;
 }
+
+.disabled {
+  cursor: default;
+  color: #7a7a7a;
+}
+
 </style>
