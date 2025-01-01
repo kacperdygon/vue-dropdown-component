@@ -43,3 +43,18 @@ provide<(value: any, label: string) => void>('selectOption', selectOption)
     </ul>
   </div>
 </template>
+
+<style scoped>
+
+div {
+  position:relative;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position:absolute;
+
+}
+</style>
