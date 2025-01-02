@@ -35,6 +35,15 @@ onMounted(() => {
   if (props.selected) {
     selectThisOption()
   }
+  if (!thisElement.value) {
+    throw new Error('Li ref not set.')
+  } else {
+    thisElement.value.addEventListener('keydown', (event) => {
+      if (event.key == 'Enter') {
+        selectThisOption()
+      }
+    })
+  }
 })
 
 const classObject = computed(() => ({
@@ -43,7 +52,7 @@ const classObject = computed(() => ({
 </script>
 
 <template>
-  <li @click="handleClick" ref="thisElement" :class="classObject">
+  <li @click="handleClick" ref="thisElement" :class="classObject" tabindex="0">
     <slot />
   </li>
 </template>

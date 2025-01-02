@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, provide, computed } from 'vue'
+import { ref, provide, computed, onMounted } from 'vue'
 
 const props = defineProps<{
   defaultValue: any
@@ -19,8 +19,9 @@ const currentLabel = ref<string>(props.defaultLabel)
 const isOpen = ref<boolean>(false)
 const ulRef = ref<HTMLElement>()
 const buttonRef = ref<HTMLElement>()
+const parentDivRef = ref<HTMLElement>()
 
-function onClick() {
+function changeVisibility() {
   isOpen.value = !isOpen.value
 }
 
@@ -30,6 +31,10 @@ const selectOption = (value: any, label: string) => {
   isOpen.value = false
   model.value = value
   emit('optionChanged', value, label)
+}
+
+const closeDropdownMenu = () => {
+  isOpen.value = false
 }
 
 provide<(value: any, label: string) => void>('selectOption', selectOption)
@@ -46,11 +51,31 @@ const buttonWidth = computed(() => {
   ulRef.value.style.display = 'none'
   return returnValue
 })
+
+onMounted(() => {
+  if (!parentDivRef.value) {
+    throw new Error('Li ref not set.')
+  } else {
+    document.addEventListener('keydown', (event) => {
+      if (event.code == 'Escape') {
+        closeDropdownMenu()
+      }
+    })
+    document.addEventListener('click', (event) => {
+      if (!parentDivRef.value) {
+        throw new Error('Parent div ref not set.')
+      }
+      if (!parentDivRef.value.contains(event.target as Node) && isOpen.value == true) {
+        closeDropdownMenu()
+      }
+    })
+  }
+})
 </script>
 
 <template>
-  <div>
-    <button @click="onClick" class="dropdown-button" ref="buttonRef">
+  <div ref="parentDivRef">
+    <button @click="changeVisibility" class="dropdown-button" ref="buttonRef">
       {{ currentLabel }}
     </button>
     <ul ref="ulRef" v-show="isOpen" class="dropdown-menu">
@@ -69,10 +94,10 @@ div {
 }
 
 .dropdown-button {
-  all: unset;
   background-color: #d3d3ff;
   cursor: pointer;
   width: v-bind(buttonWidth);
+  text-align: left;
 }
 
 ul {
